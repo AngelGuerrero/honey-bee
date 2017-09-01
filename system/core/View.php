@@ -52,8 +52,6 @@ class View
       require ($template_path);
 
       $output = ob_get_contents();
-      ob_end_clean();
-      ob_end_flush();
 
       echo $output;
 

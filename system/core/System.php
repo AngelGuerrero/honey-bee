@@ -112,7 +112,13 @@ class System
     //
     $this->routes = explode('/', $this->uri);
 
-    $this->controller = $this->routes[1];
+    //
+    // If there are not a request controller
+    // 
+    if ( ! isset($this->controller))
+    {
+      $this->controller = DEFAULT_CONTROLLER;
+    }
 
     //
     // is requesting a method... ?
@@ -142,7 +148,7 @@ class System
   {
     $request_uri = explode('/', $_SERVER["REQUEST_URI"]);
 
-    define('SERVER_NAME', 'http://'.$_SERVER['SERVER_NAME']);
+    define('SERVER_NAME', $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME']);
     define('BASEPATH', SERVER_NAME.$this->basepath);
     define('BASE_URL', BASEPATH.DEFAULT_CONTROLLER);
     define('APPPATH', SERVER_NAME.$this->basepath.'app/');

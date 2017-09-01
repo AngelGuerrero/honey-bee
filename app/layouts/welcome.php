@@ -7,10 +7,10 @@
   </head>
   <body>
     <!-- load a portion of code -->
-    <?php $this->obj->include('header') ?>
+    <?php $this->view->include('header') ?>
 
     <!-- load the main content -->
-    <?php $this->obj->include('index', 'views/'); ?>
+    <?php $this->view->include('index', 'views/'); ?>
 
   </body>
 </html>

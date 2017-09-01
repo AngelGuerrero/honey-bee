@@ -3,9 +3,10 @@
 include 'system/core/System.php';
 
 //
-// Define que main controller, that resolves the url
+// Load a default controller where there are not
+// a request for controller
 //
-define('DEFAULT_CONTROLLER', 'main');
+define('DEFAULT_CONTROLLER', 'home');
 
 
 //

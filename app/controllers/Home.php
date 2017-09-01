@@ -1,6 +1,6 @@
 <?php
 
-class Main_Controller extends Controller
+class Home_Controller extends Controller
 {
 
   function __construct()
@@ -11,7 +11,7 @@ class Main_Controller extends Controller
   public function index()
   {
     $this->view->title = "¡First app!";
-    $this->view->obj = $this->view;
-    $this->view->render('master');
+    $this->view->view = $this->view;
+    $this->view->render('welcome');
   }
 }

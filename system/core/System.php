@@ -113,19 +113,18 @@ class System
     $this->routes = explode('/', $this->uri);
 
     //
-    // If there are not a request controller
-    // 
-    if ( ! isset($this->controller))
-    {
-      $this->controller = DEFAULT_CONTROLLER;
-    }
+    // Define the controller
+    //
+    (! isset($this->routes[1]) || empty($this->routes[1]) )
+    ? $this->controller = DEFAULT_CONTROLLER
+    : $this->controller =$this->routes[1];
 
     //
     // is requesting a method... ?
     //
-    isset($this->routes[2])
-    ? $this->method = $this->routes[2]
-    : $this->method = "";
+    (! isset($this->routes[2]) || empty($this->routes[2]))
+    ? $this->method = "index"
+    : $this->method = $this->routes[2];
 
     //
     // is there a parameter... ?

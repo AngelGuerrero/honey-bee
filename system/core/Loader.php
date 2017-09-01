@@ -26,11 +26,6 @@ class Loader
   {
     $view = new view();
 
-    if ( ! isset($controllerName) || $controllerName == "")
-    {
-      $controllerName = DEFAULT_CONTROLLER;
-    }
-
     //
     // Check if the file exists
     //
@@ -65,16 +60,9 @@ class Loader
         }
         else
         {
-          echo "<br> The method: '$methodName' that you are trying to call, it does not exist or I can not find it...<br>";
+          echo "<br> The method: '$methodName' of '$controllerName' that you are trying to call, it does not exist or I can not find it...<br>";
           exit(1);
         }
-      }
-      else
-      {
-        //
-        // Call the default method, index
-        //
-        call_user_func(array($obj, "index"), $param);
       }
     }
     else

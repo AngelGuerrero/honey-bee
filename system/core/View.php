@@ -45,28 +45,14 @@ class View
   {
     $template_path = 'app/layouts/'.$template.'.php';
 
-    // if (file_exists($template_path))
-    // {
+    if (file_exists($template_path))
+    {
       ob_start();
       // you can access $this->data in template
       require ($template_path);
 
       $output = ob_get_contents();
-
-      echo $output;
-
-    // $data['test'] = "Esto es una prueba";
-    //
-    // if ( ! isset($template) )
-    // {
-    //   echo "<br>No hay una plantilla definida <br>";
-    // }
-    //
-    // $path = 'app/views/'.$page.'.php';
-    // if (file_exists($path))
-    // {
-    //
-    // }
+    }
   }
 
   public function include($file, $folder = "layouts/_includes/")
@@ -79,11 +65,5 @@ class View
     require($file_path);
 
     $output = ob_get_contents();
-
-    ob_end_clean();
-    ob_end_flush();
-
-    echo $output;
-}
-
+  }
 }

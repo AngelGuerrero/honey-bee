@@ -1,168 +1,175 @@
 <?php
 
-require_once "Loader.php";
+namespace System\Core;
 
-/**
+/*
+ * ------------------------------------------------------
+ * SYSTEM CLASS
+ * ------------------------------------------------------
+ *
  *
  */
 class System
 {
-  /**
-   * Save the URL given
-   * @var array
-   */
-  protected $routes = array();
+    /**
+     * Save the MySQL connection
+     *
+     * @var object
+     */
+    public $connection;
+
+    /**
+     * It is the access to the System Class methods
+     *
+     * @var mixed
+     */
+    public $load;
 
 
-  /**
-   * Save the basepath of the application
-   * @var string
-   */
-  protected $basepath;
+    /**
+     * Save the instance of Database Class for use the methods
+     * Connect and Close Connection
+     *
+     * @var object
+     */
+    public $db;
 
 
-  /**
-   * Save the URI given
-   * @var string
-   */
-  protected $uri;
+    // -----------------------------------------------------------------
+
+    public function __construct()
+    {
+        $this->init();
+    }
+
+    // -----------------------------------------------------------------
+
+    private function init()
+    {
+        $this->view = new View();
+        $this->view->view = $this->view;
+
+        // new Bootstrap();
+    }
+
+    /**
+    * Load a controller
+    *
+    * @param  string $controllerName Nombre del controlador a cargar
+    * @param  string $methodName     Nombre del método a llamar del controlador
+    * @param  string $param          Parámetro dado para el método
+    * @return void
+    */
+    public function controller($controllerName, $methodName = "", $param = "")
+    {
+
+        //
+        // Check the existence of requested controller
+        //
+        if (file_exists('public/app/controllers/'.ucfirst($controllerName).'.php')) {
+
+            // Set the controller class name, adds '_Controller'
+            $classname = ucfirst($controllerName) . '_Controller';
+
+            //
+            // Auto load the controller
+            //
+            spl_autoload_register(function ($classname) use ($controllerName) {
+                $filename = "public/app/controllers/".ucfirst($controllerName).".php";
+                require_once($filename);
+            });
+
+            //
+            // Create a new instance for the requested class
+            // calling the correspondent namespace
+            //
+            $namespace = 'System\\App\\'.$classname;
+            $obj = new $namespace();
+
+            //
+            // Try to call the requested methods if exists
+            //
+            if (isset($methodName) && $methodName != "") {
+                if (method_exists($obj, $methodName)) {
+                    call_user_func(array($obj, $methodName), $param);
+                } else {
+                    $this->view->title = "Page not found :(";
+                    $this->view->page = "404";
+                    $this->view->place = "views/errors/";
+                    $this->view->message = "The method '$methodName' doesn't exists, verify your URL.";
+                    $this->view->render('errors/base');
+                }
+            } else {
+                //
+                // If there is not a method, call the main function index
+                //
+                call_user_func(array($obj, "index"), $param);
+            }
+        } else {
+            $this->view->title = "Page not found:( ";
+            $this->view->page = "404";
+            $this->view->place = "views/errors/";
+            $this->view->message = "Error 404, the controller ".$controllerName." not found.";
+            $this->view->render("errors/base");
+        }
+    }
+
+    /**
+     * Create a new connection to the database
+     *
+     * Create a new instance of the Database class
+     *
+     * @return void
+     */
+    public function database()
+    {
+        $this->db = new Database();
+        $this->connection = $this->db->connect();
+    }
 
 
-  /**
-   * Save the base URL of the app
-   * @var string
-   */
-  protected $base_url;
+    /**
+     * Load a specific model
+     *
+     * Loads the models
+     *
+     * @return void
+     */
+    public function model($classname, $alias = "")
+    {
+        $pathFile = 'public/app/models/'.$classname.'.php';
+
+        /*
+         * ------------------------------------------------------
+         * If the file doesn't exist, there is nothing to do... :(
+         * ------------------------------------------------------
+         */
+
+        if (! file_exists($pathFile)) {
+            echo "El archivo $classname.php modelo no existe";
+            exit(1);
+        }
+
+        require(dirname(__FILE__).'../../../public/app/models/'.$classname.'.php');
+
+        // Just save the class name with its namespace
+        $namespace = 'System\\App\\'.$classname;
+
+        if (isset($alias) && $alias != "") {
+          $this->$alias     = new $namespace();
+        } else {
+          $this->$classname = new $namespace();
+        }
+
+    }
 
 
-  /**
-   * Save the name of searched controller
-   * @var string
-   */
-  protected $controller;
-
-
-  /**
-   * Save the name of the searched method
-   * @var string
-   */
-  protected $method;
-
-
-  /**
-   * Save the parameter if is there
-   * @var string
-   */
-  protected $param;
-
-  // -----------------------------------------------------------------
-
-  public function __construct()
-  {
-    $this->load = new Loader();
-  }
-
-  // -----------------------------------------------------------------
-
-
-  /**
-   * Function init, only follow a sequence of steps,
-   * this will be it's life cycle.
-   *
-   * @return void
-   */
-  public function init()
-  {
-    $this->getURI();
-
-    $this->constants();
-
-    // Load a clases of given path
-    $this->load->autoload('system/core/');
-
-    // Load the database
-    // ---
-
-    // Load the models
-    // ---
-
-    // Load the hooks
-    // ---
-    // Load the request controller
-    $this->load->controller($this->controller, $this->method, $this->param);
-  }
-
-
-  // -----------------------------------------------------------------
-
-
-  /**
-   * getURI, only resolve the URI and set the controller name and method name...
-   *
-   * @return void
-   */
-  public function getURI()
-  {
-    $this->basepath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, - 1)).'/';
-
-    $this->uri = substr($_SERVER['REQUEST_URI'], strlen($this->basepath));
-
-    //
-    // Save the route in array
-    //
-    $this->routes = explode('/', $this->uri);
-
-    //
-    // Define the controller
-    //
-    (! isset($this->routes[1]) || empty($this->routes[1]) )
-    ? $this->controller = DEFAULT_CONTROLLER
-    : $this->controller =$this->routes[1];
-
-    //
-    // is requesting a method... ?
-    //
-    (! isset($this->routes[2]) || empty($this->routes[2]))
-    ? $this->method = "index"
-    : $this->method = $this->routes[2];
-
-    //
-    // is there a parameter... ?
-    //
-    isset($this->routes[3])
-    ? $this->param = $this->routes[3]
-    : $this->param = "";
-  }
-
-
-  // -----------------------------------------------------------------
-
-
-  /**
-   * This function set the constants for the app
-   *
-   * @return void
-   */
-  public function constants()
-  {
-    $request_uri = explode('/', $_SERVER["REQUEST_URI"]);
-
-    define('SERVER_NAME', $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME']);
-    define('BASEPATH', SERVER_NAME.$this->basepath);
-    define('BASE_URL', BASEPATH.DEFAULT_CONTROLLER);
-    define('APPPATH', SERVER_NAME.$this->basepath.'app/');
-    define('STATICPATH', APPPATH.'assets/');
-
-    define('VIEWPATH', APPPATH.'views/');
-    define('SYSPATH', $this->basepath.'system/');
-
-
-    // echo "SERVER_NAME: ".SERVER_NAME."<br>";
-    // echo "base_url: ".BASE_URL."<br>";
-    // echo "basepath: ".BASEPATH."<br>";
-    // echo "apppath: ".APPPATH."<br>";
-    // echo "viewpath: ".VIEWPATH."<br>";
-    // echo "SYSPATH: ".SYSPATH."<br>";
-    // echo "STATICPATH: ".STATICPATH."<br>";
-  }
+    /**
+     * View function
+     * @return object Returns a view instance
+     */
+    public function view()
+    {
+        return new View();
+    }
 }

@@ -1,0 +1,14 @@
+{
+    "name": "honey-bee/honey-bee",
+    "description": "Small php framework for personal use",
+    "type": "project",
+    "require": {
+        "rickysu/php-livereload": "^0.1.2"
+    },
+    "authors": [
+        {
+            "name": "Ángel Guerrero",
+            "email": "_angelguerrero_@outlook.com"
+        }
+    ]
+}

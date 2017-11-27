@@ -1,69 +1,75 @@
 <?php
 
+
+namespace System\Core;
+
 /**
- * Class view
+ * View class
  *
- * This class will save the data for send at the template,
- * and will render one given template, the main idea with this
- * is try to create a Template Engine.
- *
+ * This class tries to 'render' a layout, and tries to
+ * work like a template engine
  */
 class View
 {
-  /**
-   * Name or path of template to use
-   * @var string
-   */
-  public $template;
+    /**
+     * Save the name of the template
+     * @var string
+     */
+    public $template;
 
 
-  /**
-   * Save the name of the file to load
-   * @var string
-   */
-  public $filename;
+    /**
+     * Save the name file to load
+     * @var string
+     */
+    public $file;
 
 
-  // -----------------------------------------------------------------
+    // -----------------------------------------------------------------
 
-
-  function __construct()
-  {
-  }
-
-  // -----------------------------------------------------------------
-
-
-  /**
-   * Render method will load the given template as parameter
-   *
-   *
-   * @param  string $template Name or path or the template to load
-   * @return void
-   */
-  public function render($template)
-  {
-    $template_path = 'app/layouts/'.$template.'.php';
-
-    if (file_exists($template_path))
+    public function __construct()
     {
-      ob_start();
-      // you can access $this->data in template
-      require ($template_path);
-
-      $output = ob_get_contents();
     }
-  }
 
-  public function include($file, $folder = "layouts/_includes/")
-  {
+    // -----------------------------------------------------------------
 
-    $file_path = 'app/'.$folder.$file.'.php';
 
-    ob_start();
+    /**
+     * Load a template file
+     *
+     * @param  string $template layout
+     * @return void
+     */
+    public function render($template)
+    {
+        $template_path = 'public/app/layouts/'.$template.'.php';
 
-    require($file_path);
+        if (file_exists($template_path)) {
+            ob_start();
 
-    $output = ob_get_contents();
-  }
+            require($template_path);
+
+            $output = ob_get_contents();
+        }
+    }
+
+
+    /**
+     * Include function, tries to includes a part of code
+     * of another file.
+     *
+     * @param  string $file   Name of the file to load
+     * @param  string $place Path of the file to load
+     * @return void
+     */
+    public function include($file, $place = "layouts/_includes/")
+    {
+        $file_path = 'public/app/'.$place.$file.'.php';
+
+        ob_start();
+
+        require($file_path);
+
+        $output = ob_get_contents();
+    }
 }

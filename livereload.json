@@ -1,0 +1,8 @@
+{
+  "period": 1,
+  "watch": {
+    "app/assets/css/": "*.css",
+    "app/assets/js/": "*.js",
+    "app/assets/images/": "\\.png|gif|jpg$"
+  }
+}

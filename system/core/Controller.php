@@ -1,18 +1,34 @@
 <?php
+
+namespace System\Core;
+
 /**
- * Class controller
+ * Controller class
  *
- * 
  */
 class Controller
 {
-  protected $view;
+    public function __construct()
+    {
+        /*
+         * ------------------------------------------------------
+         * This is some strange...
+         * ------------------------------------------------------
+         */
 
-  function __construct()
-  {
-    $this->view = new View();
+        // Assign the instance of system
+        $this->load = $GLOBALS['system'];
 
-    $this->load = new Loader();
-  }
+        //
+        // Create a new property on the 'fly'
+        //
+        $this->view = $this->load->view();
 
+        //
+        // This WORKS! I pretend to do the next into controller
+        //
+        //      $this->view->render()
+        //
+        $this->view->view = $this->view;
+    }
 }

@@ -15,10 +15,10 @@ class System
 
 
   /**
-   * Save the basepath of the application
+   * Save the basePath of the application
    * @var string
    */
-  protected $basepath;
+  protected $basePath;
 
 
   /**
@@ -103,9 +103,9 @@ class System
    */
   public function getURI()
   {
-    $this->basepath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, - 1)).'/';
+    $this->basePath = implode('/', array_slice(explode('/', $_SERVER['SCRIPT_NAME']), 0, -1)) . '/';
 
-    $this->uri = substr($_SERVER['REQUEST_URI'], strlen($this->basepath));
+    $this->uri = substr($_SERVER['REQUEST_URI'], strlen($this->basePath));
 
     //
     // Save the route in array
@@ -115,28 +115,24 @@ class System
     //
     // Define the controller
     //
-    (! isset($this->routes[1]) || empty($this->routes[1]) )
-    ? $this->controller = DEFAULT_CONTROLLER
-    : $this->controller =$this->routes[1];
+    (!isset($this->routes[1]) || empty($this->routes[1]))
+      ? $this->controller = DEFAULT_CONTROLLER
+      : $this->controller = $this->routes[1];
 
     //
     // is requesting a method... ?
     //
-    (! isset($this->routes[2]) || empty($this->routes[2]))
-    ? $this->method = "index"
-    : $this->method = $this->routes[2];
+    (!isset($this->routes[2]) || empty($this->routes[2]))
+      ? $this->method = "index"
+      : $this->method = $this->routes[2];
 
     //
     // is there a parameter... ?
     //
     isset($this->routes[3])
-    ? $this->param = $this->routes[3]
-    : $this->param = "";
+      ? $this->param = $this->routes[3]
+      : $this->param = "";
   }
-
-
-  // -----------------------------------------------------------------
-
 
   /**
    * This function set the constants for the app
@@ -145,24 +141,22 @@ class System
    */
   public function constants()
   {
-    $request_uri = explode('/', $_SERVER["REQUEST_URI"]);
+    define('SERVER_NAME', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME']);
+    define('BASE_PATH', SERVER_NAME . $this->basePath);
+    define('BASE_URL', BASE_PATH . DEFAULT_CONTROLLER);
+    define('APPPATH', SERVER_NAME . $this->basePath . 'app/');
+    define('STATIC_PATH', APPPATH . 'assets/');
 
-    define('SERVER_NAME', $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME']);
-    define('BASEPATH', SERVER_NAME.$this->basepath);
-    define('BASE_URL', BASEPATH.DEFAULT_CONTROLLER);
-    define('APPPATH', SERVER_NAME.$this->basepath.'app/');
-    define('STATICPATH', APPPATH.'assets/');
-
-    define('VIEWPATH', APPPATH.'views/');
-    define('SYSPATH', $this->basepath.'system/');
+    define('VIEWPATH', APPPATH . 'views/');
+    define('SYSTEM_PATH', $this->basePath . 'system/');
 
 
     // echo "SERVER_NAME: ".SERVER_NAME."<br>";
     // echo "base_url: ".BASE_URL."<br>";
-    // echo "basepath: ".BASEPATH."<br>";
+    // echo "basePath: ".BASE_PATH."<br>";
     // echo "apppath: ".APPPATH."<br>";
     // echo "viewpath: ".VIEWPATH."<br>";
-    // echo "SYSPATH: ".SYSPATH."<br>";
-    // echo "STATICPATH: ".STATICPATH."<br>";
+    // echo "SYSTEM_PATH: ".SYSTEM_PATH."<br>";
+    // echo "STATIC_PATH: ".STATIC_PATH."<br>";
   }
 }

@@ -26,7 +26,6 @@ class View
 
   // -----------------------------------------------------------------
 
-
   function __construct()
   {
   }
@@ -43,13 +42,12 @@ class View
    */
   public function render($template)
   {
-    $template_path = 'app/layouts/'.$template.'.php';
+    $template_path = 'app/layouts/' . $template . '.php';
 
-    if (file_exists($template_path))
-    {
+    if (file_exists($template_path)) {
       ob_start();
       // you can access $this->data in template
-      require ($template_path);
+      require($template_path);
 
       $output = ob_get_contents();
     }
@@ -57,8 +55,7 @@ class View
 
   public function include($file, $folder = "layouts/_includes/")
   {
-
-    $file_path = 'app/'.$folder.$file.'.php';
+    $file_path = 'app/' . $folder . $file . '.php';
 
     ob_start();
 

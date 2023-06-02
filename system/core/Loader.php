@@ -4,7 +4,7 @@
  * Class Loader
  *
  * The idea for this class is that load the different components
- * of the "framework".
+ * of the "library".
  *
  */
 class Loader
@@ -24,49 +24,36 @@ class Loader
    */
   public function controller($controllerName, $methodName = "", $param = "")
   {
-    $view = new view();
+    $controller_path = 'app/controllers/' . ucfirst($controllerName) . '.php';
 
-    //
-    // Check if the file exists
-    //
-    $controller_path = 'app/controllers/'.ucfirst($controllerName).'.php';
-
-    if (file_exists($controller_path) )
-    {
-      // Set the name of the class, adding the suffix _Controller
-      $classname = ucfirst($controllerName.'_Controller');
+    if (file_exists($controller_path)) {
+      $className = ucfirst($controllerName . '_Controller');
 
       //
-      // Autocarga el controlador o su clase correspondiente
+      // Autoload the controller or the class
       //
-      spl_autoload_register(function($classname) use ($controllerName) {
-        $filename = "app/controllers/".ucfirst($controllerName).'.php';
+      spl_autoload_register(function ($className) use ($controllerName) {
+        $filename = "app/controllers/" . ucfirst($controllerName) . '.php';
         require($filename);
       });
 
       //
       // New instance of controller
       //
-      $obj = new $classname();
+      $obj = new $className();
 
       //
       // Try to load the method if exists
       //
-      if (isset($methodName) && $methodName != "")
-      {
-        if (method_exists($obj, $methodName))
-        {
+      if (isset($methodName) && $methodName != "") {
+        if (method_exists($obj, $methodName)) {
           call_user_func(array($obj, $methodName), $param);
-        }
-        else
-        {
+        } else {
           echo "<br> The method: '$methodName' of '$controllerName' that you are trying to call, it does not exist or I can not find it...<br>";
           exit(1);
         }
       }
-    }
-    else
-    {
+    } else {
       echo "<br>The Controller: '$controllerName' that you are trying to call, it does not exist or I can not find it...<br>";
     }
   }
@@ -75,21 +62,18 @@ class Loader
    * Load the View class and create a new instance of it.
    * @return void
    */
-  public function view()
+  public function view(): View
   {
     //
-    // Autocarga el controlador o su clase correspondiente
+    // Autoload the View class
     //
-    $classname = "View";
-    spl_autoload_register(function($classname) {
+    $className = "View";
+    spl_autoload_register(function ($className) {
       $filename = "View.php";
       require($filename);
     });
 
-    //
-    // Crea una instancia de la clase solicitada
-    //
-    $obj = new $classname();
+    $obj = new $className();
 
     return $obj;
   }
@@ -101,25 +85,12 @@ class Loader
    */
   public function autoload($dir)
   {
-    // echo "dir: $dir<br>";
-    //
-    // Realiza un autocarga de clases
-    //
     $files = scandir($dir);
 
-    $objetos = array();
-
-    foreach($files as $file)
-    {
-      if ($file != "." && $file != "..")
-      {
-        // echo "El file: $file<br>";
-        $classname = basename($file, '.php');
-        // echo "className: $classname<br>";
-
-        spl_autoload_register(function($classname) use ($dir, $file) {
-          require_once($dir.$file);
-          // echo "Cargando: $dir$file<br>";
+    foreach ($files as $file) {
+      if ($file != "." && $file != "..") {
+        spl_autoload_register(function ($className) use ($dir, $file) {
+          require_once($dir . $file);
         });
       }
     }
